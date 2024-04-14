@@ -110,7 +110,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 			//
 			// In order for the Windows Service Management system to leverage configured
 			// recovery options, we need to terminate the process with a non-zero exit code.
-			Environment.Exit(1);
+			Environment.Exit(1); // skipcq: CS-W1005 具体原因见上文注释
 		}
 	}
 }
