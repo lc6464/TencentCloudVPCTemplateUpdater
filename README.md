@@ -15,7 +15,7 @@
 ## TemplateIds:Mode
 | Mode | Description                                                 |
 | ---- | ----------------------------------------------------------- |
-| 0    | Single template, auto version.                              |
+| 0    | Single template, auto version (**Recommended**).            |
 | 1    | Multiple templates, auto version, keep the other.           |
 | 2    | Multiple templates, auto version, set the other loopback.   |
 | 3    | Multiple templates, IPv6 only, keep IPv4.                   |
