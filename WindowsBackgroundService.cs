@@ -114,7 +114,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 		logger.LogDebug("服务已启动。");
 
 		try {
-			if (!new int[] { -1, 0, 1, 2, 3, 4, 5, 6 }.Contains(mode)) {
+			if (!new[]{ -1, 0, 1, 2, 3, 4, 5, 6 }.Contains(mode)) {
 				logger.LogError("服务配置的运行模式有误，请修改配置文件后再次运行！");
 				Environment.Exit(-1); // skipcq: CS-W1005 模式有误，直接退出
 			}
