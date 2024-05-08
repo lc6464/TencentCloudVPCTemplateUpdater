@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-TencentCloudVPCTemplateUpdater-ee07a44c-94e5-4bdf-8d58-f52b9ae12ace</UserSecretsId>
-    <Platforms>x64</Platforms>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>x64</Platforms>
+		<Version>1.0.0.0</Version>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
 		<PackageReference Include="TencentCloudSDK.Vpc" Version="3.0.984" />
-  </ItemGroup>
+	</ItemGroup>
 </Project>
