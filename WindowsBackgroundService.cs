@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using TencentCloud.Common;
 using TencentCloud.Vpc.V20170312;
 using TencentCloud.Vpc.V20170312.Models;
@@ -22,12 +21,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 	private readonly ModifyAddressTemplateAttributeRequest requestSingle = new() {
 		AddressTemplateId = configuration.GetValue<string>("TemplateIds:Single")
 	};
-	private static readonly HttpClient httpClient = new() {
-		BaseAddress = new("https://api.lcwebsite.cn/GetIP"),
-		Timeout = TimeSpan.FromSeconds(5),
-		DefaultRequestVersion = HttpVersion.Version30,
-		DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
-	};
+
 
 	private async Task<bool> UpdateTemplate(Func<ModifyAddressTemplateAttributeRequest, Task<ModifyAddressTemplateAttributeResponse>> func,
 		string address, string family, CancellationToken stoppingToken) {
@@ -55,7 +49,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 				if (family == "IPv4") {
 					logger.LogWarning("获取到的 IP 地址 {Address} 协议为 IPv4，目前设置了 IPv6 only 模式，十分钟后重试。", address);
 
-					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken).ConfigureAwait(false);
 
 					return false;
 				}
@@ -65,7 +59,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 				if (family == "IPv4") {
 					logger.LogWarning("获取到的 IP 地址 {Address} 协议为 IPv4，目前设置了 IPv6 only 模式，十分钟后重试。", address);
 
-					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken).ConfigureAwait(false);
 
 					return false;
 				}
@@ -76,7 +70,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 				if (family == "IPv6") {
 					logger.LogWarning("获取到的 IP 地址 {Address} 协议为 IPv6，目前设置了 IPv4 only 模式，十分钟后重试。", address);
 
-					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken).ConfigureAwait(false);
 
 					return false;
 				}
@@ -86,7 +80,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 				if (family == "IPv6") {
 					logger.LogWarning("获取到的 IP 地址 {Address} 协议为 IPv6，目前设置了 IPv4 only 模式，十分钟后重试。", address);
 
-					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+					await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken).ConfigureAwait(false);
 
 					return false;
 				}
@@ -99,22 +93,27 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 				break;
 		}
 
-		logger.LogInformation("Single 地址已更新为 {AddressSingle}，V6 地址已更新为 {AddressV6}，V4 地址已更新为 {AddressV4}，" +
-			"Single 请求 ID 为 {RequestIdSingle}，V6 请求 ID 为 {RequestIdV6}，V4 请求 ID 为 {RequestIdV4}，十分钟后继续。",
-			responseSingle is null ? "未更改" : requestSingle.Addresses[0], responseV6 is null ? "未更改" : requestV6.Addresses[0],
-			responseV4 is null ? "未更改" : requestV4.Addresses[0], responseSingle?.RequestId ?? "未请求",
-			responseV6?.RequestId ?? "未请求", responseV4?.RequestId ?? "未请求");
+		const string logging = "Single 地址已更新为 {SingleAddress}，请求 ID 为 {SingleRequestId}；"
+			+ "V6 地址已更新为 {V6Address}，请求 ID 为 {V6RequestId}；"
+			+ "V4 地址已更新为 {V4Address}，请求 ID 为 {V4RequestId}；十分钟后继续。";
 
-		await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+		logger.LogInformation(logging,
+			responseSingle is null ? "未更改" : requestSingle.Addresses[0], responseSingle?.RequestId,
+			responseV6 is null ? "未更改" : requestV6.Addresses[0], responseV6?.RequestId,
+			responseV4 is null ? "未更改" : requestV4.Addresses[0], responseV4?.RequestId
+			);
+
+		await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken).ConfigureAwait(false);
 
 		return true;
 	}
+
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
 		logger.LogDebug("服务已启动。");
 
 		try {
-			if (!new[]{ -1, 0, 1, 2, 3, 4, 5, 6 }.Contains(mode)) {
+			if (!new[] { -1, 0, 1, 2, 3, 4, 5, 6 }.Contains(mode)) {
 				logger.LogError("服务配置的运行模式有误，请修改配置文件后再次运行！");
 				Environment.Exit(-1); // skipcq: CS-W1005 模式有误，直接退出
 			}
@@ -132,7 +131,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 						family = null;
 
 					try {
-						var addressResult = await httpClient.GetFromJsonAsync<IP>("", stoppingToken).ConfigureAwait(false);
+						var addressResult = await Utils.httpClient.GetFromJsonAsync<IP>("", stoppingToken).ConfigureAwait(false);
 						family = addressResult.Family;
 
 						if (family == "IPv4") {
@@ -146,7 +145,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 						} else {
 							logger.LogError("获取到的 IP 地址 {Address} 协议为 {Family}，目前暂不支持不支持，五分钟后重试。", addressResult.Address, family);
 
-							await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+							await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken).ConfigureAwait(false);
 
 							continue;
 						}
@@ -155,7 +154,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 					} catch (Exception e) {
 						logger.LogError(e, "获取 IP 地址时出现异常，五分钟后重试。");
 
-						await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+						await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken).ConfigureAwait(false);
 
 						continue;
 					}
@@ -163,7 +162,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 					if (address is null) {
 						logger.LogError("获取 IP 地址失败，地址为空，五分钟后重试。");
 
-						await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+						await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken).ConfigureAwait(false);
 
 						continue;
 					}
@@ -171,7 +170,7 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 					if (address == lastAddress) {
 						logger.LogInformation("IP 地址未发生变化，已跳过，十分钟后继续。");
 
-						await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+						await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken).ConfigureAwait(false);
 
 						continue;
 					}
@@ -183,18 +182,18 @@ public sealed class WindowsBackgroundService(ILogger<WindowsBackgroundService> l
 				} catch (TencentCloudSDKException e) {
 					logger.LogError(e, "更新 IP 地址时出现腾讯云 SDK 异常，请求 ID 为 {RequestId}，五分钟后重试。", e.RequestId);
 
-					await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+					await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken).ConfigureAwait(false);
 
 					continue;
 				} catch (Exception e) {
 					logger.LogError(e, "更新 IP 地址时出现异常，五分钟后重试。");
 
-					await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+					await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken).ConfigureAwait(false);
 
 					continue;
 				}
 
-				await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+				await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken).ConfigureAwait(false);
 			}
 		} catch (OperationCanceledException) {
 			// When the stopping token is canceled, for example, a call made from services.msc,
