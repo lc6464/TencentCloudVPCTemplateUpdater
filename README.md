@@ -24,15 +24,15 @@
 - `.\TencentCloudVPCTemplateUpdater.exe status` - Show the Windows service status (Administrator permission is **not** needed).
 
 ## app settings
-| Key                | Value                      |
-| ------------------ | -------------------------- |
-| Secret:Id          | TencentCloud SecretId      |
-| Secret:Key         | TencentCloud SecretKey     |
-| Region             | TencentCloud Region        |
-| TemplateIds:Mode   | Templates updating mode    |
-| TemplateIds:Single | Template Id, single mode   |
-| TemplateIds:V4     | TemplateV4 Id, multi mode  |
-| TemplateIds:V6     | TemplateV6 Id, multi mode  |
+| Key                | Value                          |
+| ------------------ | ------------------------------ |
+| Secret:Id          | TencentCloud SecretId          |
+| Secret:Key         | TencentCloud SecretKey         |
+| Region             | TencentCloud Region            |
+| TemplateIds:Mode   | Templates updating mode        |
+| TemplateIds:Single | Template Id, for single mode   |
+| TemplateIds:V4     | TemplateV4 Id, for multi mode  |
+| TemplateIds:V6     | TemplateV6 Id, for multi mode  |
 
 ## TemplateIds:Mode
 | Mode | Description                                                 |
