@@ -15,7 +15,7 @@ public static class Utils {
 	};
 
 
-	public static async Task Delay1s() => await Task.Delay(TimeSpan1s).ConfigureAwait(false);
+	public static async Task Delay1sAsync() => await Task.Delay(TimeSpan1s).ConfigureAwait(false);
 
 
 	public static void ExecuteScQuery() => ExecuteScAction("query");
