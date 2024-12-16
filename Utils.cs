@@ -10,8 +10,8 @@ public static class Utils {
 	public static readonly HttpClient httpClient = new() {
 		BaseAddress = new("https://api.lcwebsite.cn/GetIP"),
 		Timeout = TimeSpan.FromSeconds(5),
-		DefaultRequestVersion = HttpVersion.Version30,
-		DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
+		DefaultRequestVersion = HttpVersion.Version20,
+		DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher
 	};
 
 
